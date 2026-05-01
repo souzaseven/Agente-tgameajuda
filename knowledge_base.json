@@ -1,0 +1,119 @@
+{
+  "procedures": [
+    {
+      "id": "PROC-001",
+      "titulo": "Reset de senha de usuário no AD",
+      "categoria": "Acesso",
+      "passos": [
+        "Verificar identidade do solicitante (confirmar matrícula ou e-mail cadastrado)",
+        "Acessar Active Directory (Ferramentas Administrativas > Usuários e Computadores do AD)",
+        "Localizar conta do usuário e verificar se está ativa",
+        "Clicar com botão direito > Redefinir Senha",
+        "Definir senha temporária seguindo a política: mínimo 8 caracteres, letras + números",
+        "Marcar 'Usuário deve alterar senha no próximo logon'",
+        "Informar senha temporária ao usuário por canal seguro (telefone ou chat interno)",
+        "Registrar atendimento no Movidesk com: solicitante, ação realizada e data"
+      ]
+    },
+    {
+      "id": "PROC-002",
+      "titulo": "Abertura de acesso ao ERP Delphi",
+      "categoria": "Acesso",
+      "passos": [
+        "Verificar aprovação formal do gestor direto (e-mail ou ticket assinado)",
+        "Identificar o perfil de acesso necessário conforme função do colaborador",
+        "Acessar painel administrativo do ERP Delphi > Gestão de Usuários",
+        "Criar novo usuário com: matrícula, nome completo, e-mail corporativo",
+        "Vincular ao perfil de acesso aprovado pelo gestor",
+        "Configurar permissões de módulos conforme perfil",
+        "Testar acesso com o usuário (login + navegação básica)",
+        "Encaminhar credenciais iniciais via canal seguro",
+        "Documentar no ticket: perfil atribuído, aprovador e data de ativação"
+      ]
+    },
+    {
+      "id": "PROC-003",
+      "titulo": "Resolução de erro de sincronização no ERP",
+      "categoria": "ERP",
+      "passos": [
+        "Identificar o módulo afetado e o código de erro exibido",
+        "Verificar logs do sistema em: C:\\ERP\\Logs\\sync_AAAAMMDD.log",
+        "Confirmar se a issue é isolada (um usuário) ou sistêmica (múltiplos usuários)",
+        "Se isolada: limpar cache local do cliente ERP (menu Ferramentas > Limpar Cache)",
+        "Se sistêmica: acionar equipe de infraestrutura e abrir ticket P1 no Movidesk",
+        "Registrar código de erro, módulo afetado, usuários impactados e horário",
+        "Comunicar usuários afetados com ETA de resolução"
+      ]
+    },
+    {
+      "id": "PROC-004",
+      "titulo": "Escalonamento de ticket crítico",
+      "categoria": "Atendimento",
+      "passos": [
+        "Identificar critérios de criticidade: impacto em produção, múltiplos usuários afetados ou risco financeiro",
+        "Alterar urgência do ticket no Movidesk para 'Crítica'",
+        "Notificar coordenador de suporte via chat interno (não apenas por ticket)",
+        "Registrar no ticket: motivo do escalonamento e quem foi notificado",
+        "Definir atualização periódica ao cliente: a cada 30 minutos para P1",
+        "Coordenar com equipes técnicas envolvidas (infra, desenvolvimento, ERP)",
+        "Documentar toda a linha do tempo de ações no histórico do ticket"
+      ]
+    },
+    {
+      "id": "PROC-005",
+      "titulo": "Instalação remota de software corporativo",
+      "categoria": "Infraestrutura",
+      "passos": [
+        "Verificar se o software solicitado está na lista de softwares homologados",
+        "Confirmar aprovação do gestor para softwares que não são padrão",
+        "Acessar estação do usuário via ferramenta de acesso remoto corporativa",
+        "Verificar requisitos mínimos de sistema antes de instalar",
+        "Executar instalação silenciosa via SCCM ou manualmente com credenciais admin",
+        "Testar funcionamento do software com o usuário",
+        "Registrar no ticket: software, versão, máquina e data"
+      ]
+    }
+  ],
+  "faqs": [
+    {
+      "pergunta": "Como abrir um ticket no Movidesk?",
+      "resposta": "Acesse o portal do Movidesk com suas credenciais corporativas. Clique em 'Novo Ticket', preencha: tipo de solicitação, assunto descritivo, descrição detalhada do problema e urgência. Para impacto alto + urgência alta, marque como 'Crítico'. Anexe prints ou arquivos de log quando relevante.",
+      "categoria": "Movidesk"
+    },
+    {
+      "pergunta": "Qual o SLA para cada tipo de ticket?",
+      "resposta": "SLAs vigentes: P1 Crítico (produção parada) — primeira resposta em 30min, resolução em 4h. P2 Alto (impacto significativo) — primeira resposta em 2h, resolução em 8h. P3 Médio (impacto parcial) — primeira resposta em 4h, resolução em 24h. P4 Baixo (solicitações gerais) — primeira resposta em 8h, resolução em 48h.",
+      "categoria": "SLA"
+    },
+    {
+      "pergunta": "Como consultar pedidos no ERP Delphi?",
+      "resposta": "No ERP Delphi acesse: Módulo Comercial > Consulta de Pedidos. Filtros disponíveis: número do pedido, CNPJ/CPF do cliente, período de emissão, status (aberto/faturado/cancelado). Para detalhes financeiros use: Módulo Financeiro > Contas a Receber. Exportação em CSV: botão 'Exportar' no rodapé da consulta.",
+      "categoria": "ERP"
+    },
+    {
+      "pergunta": "O que fazer quando o ERP está lento ou travando?",
+      "resposta": "Passo a passo: 1) Feche o ERP e aguarde 30 segundos antes de reabrir. 2) Se persistir, limpe o cache: menu Ferramentas > Limpar Cache Local. 3) Verifique se há atualizações pendentes do sistema. 4) Se o problema for geral (vários usuários), acione o suporte de infraestrutura imediatamente e abra ticket P2 no Movidesk. 5) Documente: horário do início, módulos afetados e quantidade de usuários.",
+      "categoria": "ERP"
+    },
+    {
+      "pergunta": "Como solicitar criação de novo usuário no sistema?",
+      "resposta": "O gestor direto deve enviar e-mail para helpdesk@empresa.com.br ou abrir ticket no Movidesk com: nome completo do colaborador, matrícula, cargo, departamento, data de início e perfil de acesso necessário. Prazo de atendimento: 1 dia útil para sistemas críticos, 2 dias úteis para demais sistemas. O novo usuário receberá as credenciais iniciais por e-mail ou via chat interno.",
+      "categoria": "Acesso"
+    },
+    {
+      "pergunta": "Como calcular o TMA (Tempo Médio de Atendimento)?",
+      "resposta": "TMA = Soma do tempo total de atendimento de todos os tickets / Número total de tickets resolvidos no período. No Movidesk: Relatórios > Desempenho > TMA por Agente. Meta padrão: TMA ≤ 4 horas para tickets de suporte geral. Dica: TMA elevado pode indicar falta de base de conhecimento, tickets mal categorizados ou necessidade de treinamento.",
+      "categoria": "Métricas"
+    },
+    {
+      "pergunta": "O que fazer se o cliente reportar cobrança indevida?",
+      "resposta": "ATENÇÃO: Este processo envolve área financeira e/ou jurídica. Passos: 1) Registre o relato completo no ticket com valor, referência e período contestado. 2) NÃO confirme nem negue a cobrança sem consultar o financeiro. 3) Escale imediatamente para o setor financeiro com os dados do cliente. 4) Retorne ao cliente com prazo de análise (máx. 2 dias úteis). 5) Documente toda a comunicação no ticket.",
+      "categoria": "Financeiro"
+    },
+    {
+      "pergunta": "Como registrar uma ocorrência de segurança da informação?",
+      "resposta": "Qualquer suspeita de incidente de segurança (acesso indevido, vazamento, malware) deve ser: 1) Isolado imediatamente — desconecte a máquina afetada da rede se possível. 2) Reportado ao gestor e à equipe de TI/SI pelo telefone de emergência. 3) Registrado em ticket P1 no Movidesk com: descrição do incidente, sistemas afetados, horário e evidências disponíveis. NÃO tente resolver por conta própria. Este processo REQUER especialista de segurança.",
+      "categoria": "Segurança"
+    }
+  ]
+}
