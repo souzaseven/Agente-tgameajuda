@@ -1,3 +1,19 @@
+from fastapi import Depends, UploadFile, Form
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+import secrets
+import os
+from tools import KNOWLEDGE_DIR, PERGUNTAS_NAO_RESPONDIDAS
+
+security = HTTPBasic()
+ADMIN_USER = os.getenv("ADMIN_USER", "admin")
+ADMIN_PASS = os.getenv("ADMIN_PASS", "admin123")
+
+def get_current_admin(credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, ADMIN_USER)
+    correct_password = secrets.compare_digest(credentials.password, ADMIN_PASS)
+    if not (correct_username and correct_password):
+        raise HTTPException(status_code=401, detail="Credenciais inválidas", headers={"WWW-Authenticate": "Basic"})
+    return credentials.username
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -47,9 +63,32 @@ async def root():
     return FileResponse(TEMPLATES_DIR / "index.html")
 
 # Servir favicon
+# Servir favicon
 @app.get("/favicon.ico")
 async def favicon():
     return FileResponse(TEMPLATES_DIR / "favicon.ico")
+
+
+# Rotas administrativas para base de conhecimento
+@app.get("/admin/knowledge", tags=["admin"])
+async def list_knowledge_files(user: str = Depends(get_current_admin)):
+    files = [f.name for f in KNOWLEDGE_DIR.glob("*.txt")]
+    return {"arquivos": files}
+
+@app.post("/admin/knowledge/upload", tags=["admin"])
+async def upload_knowledge_file(file: UploadFile, user: str = Depends(get_current_admin)):
+    dest = KNOWLEDGE_DIR / file.filename
+    with open(dest, "wb") as f:
+        f.write(await file.read())
+    return {"ok": True, "arquivo": file.filename}
+
+@app.get("/admin/knowledge/perguntas_sem_resposta", tags=["admin"])
+async def listar_perguntas_sem_resposta(user: str = Depends(get_current_admin)):
+    if not PERGUNTAS_NAO_RESPONDIDAS.exists():
+        return {"perguntas": []}
+    with open(PERGUNTAS_NAO_RESPONDIDAS, encoding="utf-8") as f:
+        perguntas = [linha.strip() for linha in f if linha.strip()]
+    return {"perguntas": perguntas}
 
 
 @app.get("/api/intro")

@@ -1,0 +1,5 @@
+Procedimento para abrir chamado de TI:
+
+Acesse o sistema de chamados, selecione a categoria TI e preencha o formulário detalhando o problema.
+
+https://intranet.empresa.com/chamados

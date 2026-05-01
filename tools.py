@@ -262,22 +262,6 @@ def _buscar_base_conhecimento(params: dict) -> str:
         )
     }
     return json.dumps(saida, ensure_ascii=False)
-        valor = metricas.get(metrica)
-        if valor is None:
-            continue
-        meta = config["meta"]
-        if metrica in ("tma_horas", "tme_horas"):
-            if valor > meta:
-                alertas.append(f"ALERTA: {metrica} = {valor} (meta: ≤{meta}) — acima da meta")
-        else:
-            if valor < meta:
-                alertas.append(f"ALERTA: {metrica} = {valor} (meta: ≥{meta}) — abaixo da meta")
-
-    resultado = {
-        "periodo": params.get("periodo", "não informado"),
-        "metricas": metricas,
-        "benchmarks_referencia": benchmarks,
-        "alertas_identificados": alertas,
         "contexto": params.get("contexto", ""),
         "instrucao": (
             "Interprete essas métricas de atendimento. Identifique: "
