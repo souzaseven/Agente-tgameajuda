@@ -1,6 +1,11 @@
 import json
 from pathlib import Path
 from config import KB_PATH
+import os
+
+# Caminho da pasta de conhecimento e perguntas sem resposta
+KNOWLEDGE_DIR = Path(__file__).parent / "knowledge"
+PERGUNTAS_NAO_RESPONDIDAS = Path(__file__).parent / "perguntas_sem_resposta.txt"
 
 TOOL_DEFINITIONS = [
     {
@@ -212,66 +217,51 @@ def _analisar_ticket(params: dict) -> str:
     return json.dumps(resultado, ensure_ascii=False)
 
 
-def _redigir_resposta(params: dict) -> str:
-    resultado = {
-        "tipo": params.get("tipo", "outro"),
-        "tom": params.get("tom", "formal"),
-        "destinatario": params.get("destinatario", "não especificado"),
-        "contexto": params.get("contexto", ""),
-        "instrucoes_adicionais": params.get("instrucoes_adicionais", ""),
+def _buscar_base_conhecimento(params: dict) -> str:
+    consulta = params.get("consulta", "").lower()
+    categoria_filtro = params.get("categoria", "").strip()
+    termos = [t for t in consulta.split() if len(t) > 2]
+    resultados = []
+
+    # Busca nos arquivos .txt da pasta knowledge
+    if KNOWLEDGE_DIR.exists():
+        for arquivo in KNOWLEDGE_DIR.glob("*.txt"):
+            with open(arquivo, encoding="utf-8") as f:
+                conteudo = f.read()
+            texto = conteudo.lower()
+            score = sum(1 for t in termos if t in texto)
+            if score > 0:
+                urls = [linha for linha in conteudo.splitlines() if linha.strip().startswith("http")]
+                resultados.append({
+                    "arquivo": arquivo.name,
+                    "trecho": conteudo[:300] + ("..." if len(conteudo) > 300 else ""),
+                    "urls": urls,
+                    "relevancia": score
+                })
+
+    # Se não encontrou nada, registra a consulta para o admin
+    if not resultados:
+        try:
+            with open(PERGUNTAS_NAO_RESPONDIDAS, "a", encoding="utf-8") as f:
+                f.write(consulta + "\n")
+        except Exception:
+            pass
+
+    resultados.sort(key=lambda x: x["relevancia"], reverse=True)
+    top_resultados = resultados[:5]
+
+    saida = {
+        "consulta": params.get("consulta"),
+        "categoria_filtro": categoria_filtro or "todas",
+        "total_encontrado": len(resultados),
+        "resultados": top_resultados,
         "instrucao": (
-            "Redija a comunicação conforme os parâmetros fornecidos. "
-            "Tom solicitado: " + params.get("tom", "formal") + ". "
-            "Tipo: " + params.get("tipo", "outro") + ". "
-            "Seja objetivo, profissional e adequado ao destinatário. "
-            "Entregue apenas o texto final pronto para uso, sem explicações adicionais."
+            "Use esses resultados da base de conhecimento para embasar sua resposta. "
+            "Se encontrou arquivos relevantes, apresente o trecho e as URLs. "
+            "Se nenhum resultado relevante, informe claramente e sugira onde buscar."
         )
     }
-    return json.dumps(resultado, ensure_ascii=False)
-
-
-def _priorizar_fila(params: dict) -> str:
-    tickets = params.get("tickets", [])
-    sla_map = {"P1": 4, "P2": 8, "P3": 24, "P4": 48}
-
-    tickets_enriquecidos = []
-    for t in tickets:
-        prioridade = t.get("prioridade", "P3")
-        tempo = t.get("tempo_aberto_horas", 0)
-        sla_limite = sla_map.get(prioridade, 24)
-        percentual = round((tempo / sla_limite) * 100, 1) if sla_limite else 0
-        tickets_enriquecidos.append({
-            **t,
-            "sla_limite_horas": sla_limite,
-            "percentual_sla_consumido": percentual
-        })
-
-    resultado = {
-        "total_tickets": len(tickets),
-        "contexto_adicional": params.get("contexto_adicional", ""),
-        "tickets_para_priorizar": tickets_enriquecidos,
-        "instrucao": (
-            "Analise esses tickets e retorne uma lista priorizada de atendimento. "
-            "Para cada ticket, indique: posição na fila, justificativa da prioridade e ação imediata recomendada. "
-            "Considere: prioridade declarada, percentual de SLA consumido (mais alto = mais urgente), "
-            "impacto no negócio e contexto adicional informado."
-        )
-    }
-    return json.dumps(resultado, ensure_ascii=False)
-
-
-def _analisar_metricas(params: dict) -> str:
-    metricas = params.get("metricas", {})
-    benchmarks = {
-        "tma_horas": {"meta": 4, "descricao": "TMA meta ≤ 4h"},
-        "tme_horas": {"meta": 1, "descricao": "TME meta ≤ 1h"},
-        "csat": {"meta": 8, "descricao": "CSAT meta ≥ 8.0"},
-        "fcr_percentual": {"meta": 75, "descricao": "FCR meta ≥ 75%"},
-        "sla_cumprido_percentual": {"meta": 95, "descricao": "SLA cumprido meta ≥ 95%"}
-    }
-
-    alertas = []
-    for metrica, config in benchmarks.items():
+    return json.dumps(saida, ensure_ascii=False)
         valor = metricas.get(metrica)
         if valor is None:
             continue
