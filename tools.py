@@ -261,7 +261,7 @@ def _buscar_base_conhecimento(params: dict) -> str:
             "Se nenhum resultado relevante, informe claramente e sugira onde buscar."
         )
     }
-    return json.dumps(saida, ensure_ascii=False)
+        return json.dumps(saida, ensure_ascii=False)
         "contexto": params.get("contexto", ""),
         "instrucao": (
             "Interprete essas métricas de atendimento. Identifique: "
