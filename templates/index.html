@@ -15,23 +15,7 @@
       document.documentElement.setAttribute('data-theme', t);
     })();
 
-    // Redireciona chamadas /api/* para api.php?rota=... considerando subdiretório
-    const origFetch = window.fetch;
-    window.fetch = function(url, opts) {
-      if (typeof url === 'string' && url.startsWith('/api/')) {
-        const rota = url.substring(5); // remove '/api/'
-        // Caminho relativo ao index.html
-        let base = window.location.pathname;
-        // Se estiver em /templates/, volta um nível
-        if (base.includes('/templates/')) {
-          base = base.substring(0, base.lastIndexOf('/templates/')) + '/';
-        } else if (!base.endsWith('/')) {
-          base = base.substring(0, base.lastIndexOf('/') + 1);
-        }
-        url = base + 'api.php?rota=' + encodeURIComponent(rota);
-      }
-      return origFetch(url, opts);
-    };
+    // Ambiente FastAPI real: fetch padrão
   </script>
 
   <style>
